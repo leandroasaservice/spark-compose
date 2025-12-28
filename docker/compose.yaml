@@ -1,0 +1,66 @@
+services:
+  spark-master:
+    container_name: spark-master-alpine
+    build:
+      context: .
+      dockerfile: spark-alpine.Dockerfile
+    image: spark-lab-base:python3.13.0-alpine3.20
+    entrypoint: ["./entrypoint.sh", "master"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    # Uncoment if you want to attach a volume.
+    #volumes:
+    #  - type: bind
+    #    source: ../data
+    #    target: /opt/spark/data
+    #  - type: bind
+    #    source: ../spark-apps
+    #    target: /opt/spark/apps
+    #  - type: bind
+    #    source: ../spark-logs
+    #    target: /opt/spark/spark-events
+
+    ports:
+      - "9090:8080"
+      - "7077:7077"
+
+  spark-history-server:
+    container_name: spark-history-alpine
+    build:
+      context: .
+      dockerfile: spark-alpine.Dockerfile
+    image: spark-lab-base:python3.13.0-alpine3.20
+    entrypoint: ["./entrypoint.sh", "history"]
+    depends_on:
+      - spark-master
+    # Uncoment if you want to attach a volume.
+    #volumes:
+    #  - type: bind
+    #    source: ../spark-logs
+    #    target: /opt/spark/spark-events
+    ports:
+      - "18080:18080"
+
+  spark-worker:
+    build:
+      context: .
+      dockerfile: spark-alpine.Dockerfile
+    image: spark-lab-base:python3.13.0-alpine3.20
+    entrypoint: ["./entrypoint.sh", "worker"]
+    depends_on:
+      - spark-master
+    # Uncoment if you want to attach a volume.
+    #volumes:
+    #  - type: bind
+    #    source: ../data
+    #    target: /opt/spark/data
+    #  - type: bind
+    #    source: ../spark-apps
+    #    target: /opt/spark/apps
+    #  - type: bind
+    #    source: ../spark-logs
+    #    target: /opt/spark/spark-events

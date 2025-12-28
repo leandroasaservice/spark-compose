@@ -30,7 +30,7 @@ RUN apk update --no-cache && apk upgrade --no-cache \
         rsync \
         procps \
     && rm -rf /var/cache/apk/* \
-    addgroup -g ${SPARK_UID} spark \
+    && addgroup -g ${SPARK_UID} spark \
     && adduser -D -u ${SPARK_UID} -G spark -h ${SPARK_HOME} spark \
     && mkdir -p ${SPARK_HOME}/spark-events \
     && chown -R spark:spark ${SPARK_HOME}/spark-events

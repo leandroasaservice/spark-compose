@@ -1,10 +1,12 @@
+x-spark-image: &spark-image spark-lab-base:python3.13.0-alpine3.20
+
 services:
   spark-master:
     container_name: spark-master-alpine
     build:
       context: .
       dockerfile: spark-alpine.Dockerfile
-    image: spark-lab-base:python3.13.0-alpine3.20
+    image: *spark-image
     entrypoint: ["./entrypoint.sh", "master"]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080"]
@@ -30,10 +32,7 @@ services:
 
   spark-history-server:
     container_name: spark-history-alpine
-    build:
-      context: .
-      dockerfile: spark-alpine.Dockerfile
-    image: spark-lab-base:python3.13.0-alpine3.20
+    image: *spark-image
     entrypoint: ["./entrypoint.sh", "history"]
     depends_on:
       - spark-master
@@ -46,10 +45,7 @@ services:
       - "18080:18080"
 
   spark-worker:
-    build:
-      context: .
-      dockerfile: spark-alpine.Dockerfile
-    image: spark-lab-base:python3.13.0-alpine3.20
+    image: *spark-image
     entrypoint: ["./entrypoint.sh", "worker"]
     depends_on:
       - spark-master
